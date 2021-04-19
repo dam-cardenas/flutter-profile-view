@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:profile_view/src/views/user/components/app_bar.dart';
+import 'package:profile_view/src/views/user/components/user_data_form.dart';
 
 class Profile extends StatefulWidget {
   @override
@@ -18,7 +19,12 @@ class _Profile extends State<Profile> {
             title: 'Profile', 
             profileImage: '', 
             userName: 'Damian'
-          ).render(context)
+          ).render(context),
+          Container(
+            alignment: Alignment.center,
+            padding: EdgeInsets.symmetric(horizontal: 20),
+            child: UserDataForm(),
+          ),
         ],
       ),
     );

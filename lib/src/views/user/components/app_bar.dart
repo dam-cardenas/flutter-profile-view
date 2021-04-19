@@ -42,11 +42,11 @@ class ProfileAppBar {
                   child: FloatingActionButton(
                     child: Icon(Icons.camera_alt, size: 15, color: Colors.amber[900],),
                     backgroundColor: Colors.grey[100],
+                    elevation: 2,
                     mini: true, 
                     onPressed: (){print('Edit photo');}
                   ),
                 ),
-                
               ],
             ),
           )
