@@ -29,18 +29,21 @@ class _UserDataForm extends State<UserDataForm> {
   }
 
   void formSubmit() async {
-    // TODO: Call the services to get the user data
+    // TODO: Call the services to set the user data
+  }
+  void getUserData() async {
+    // TODO: call the services to get the user  data
   }
 
-  // bool isValidEmail(String email) {
-  //   // TODO: validate the email pattern
-  //   return RegExp(kEmailPattern).hasMatch(email);
-  // }
+  void isValidEmail(String email) {
+    // TODO: validate the email pattern
+    // check if the email is already taken
+  }
 
-  // bool isValidPassword(String username) {
-  //   // TODO: Validate username
-  //   return RegExp(kPasswordPattern).hasMatch(username);
-  // }
+  void isValidUsername(String username) {
+    // TODO: Validate username
+  }
+  
   @override
   Widget build(BuildContext context) {
     // TODO: The correct form  data
@@ -51,6 +54,7 @@ class _UserDataForm extends State<UserDataForm> {
             height: 20,
           ),
           TextFormField(
+            controller: _username,
             keyboardType: TextInputType.text,
             decoration: InputDecoration(
               labelText: 'Full Name',
@@ -71,10 +75,11 @@ class _UserDataForm extends State<UserDataForm> {
             height: 20,
           ),
           TextFormField(
+            controller: _email,
             keyboardType: TextInputType.emailAddress,
             decoration: InputDecoration(
               labelText: 'Email',
-              hintText: "Edit Email",
+              hintText: "example@domain.com",
               labelStyle: TextStyle(color: Colors.black54),
               suffixIcon: Icon(Icons.email, color: Colors.grey),
               border: OutlineInputBorder(),
@@ -85,6 +90,29 @@ class _UserDataForm extends State<UserDataForm> {
                   width: 1.0,
                 )
               ),
+            ),
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          SizedBox(
+            width: MediaQuery.of(context).size.width,
+            height: 56.0,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                primary: Colors.amber[900],
+                onPrimary: Colors.white,
+                elevation: 1.0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(6.0),
+                  ),
+                ),
+              ),
+              onPressed: () {
+                // call the api to update the user 
+              },
+              child: Text("Save"),
             ),
           ),
         ],

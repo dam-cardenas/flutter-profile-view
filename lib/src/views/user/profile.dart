@@ -19,7 +19,7 @@ class _Profile extends State<Profile> {
             title: 'Profile', 
             profileImage: '', 
             userName: 'Damian'
-          ).render(context),
+          ),
           Container(
             alignment: Alignment.center,
             padding: EdgeInsets.symmetric(horizontal: 20),
