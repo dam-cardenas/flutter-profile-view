@@ -30,38 +30,48 @@ class _ProfileAppBar extends State<ProfileAppBar> {
     );
   }
   
-  Future<PickedFile>  getImage(ImageSource source) async {
+  /// This function  makes the action of get and crop an image 
+  /// 
+  /// @param {ImageSource} source
+  Future<bool> getImage(ImageSource source) async {
     PickedFile image = await picker.getImage(source: source);
     if (image != null) {
-      File cropped = await ImageCropper.cropImage(
-        sourcePath: image.path,
-        aspectRatio: CropAspectRatio(
-          ratioX: 1,
-          ratioY: 1
-        ),
-        compressQuality: 100,
-        maxWidth: 700,
-        maxHeight: 700,
-        compressFormat: ImageCompressFormat.jpg,
-        androidUiSettings: AndroidUiSettings(
-          toolbarColor: Colors.deepOrange,
-          toolbarTitle: 'Adjust your profile image',
-          statusBarColor: Colors.deepOrange.shade900,
-          backgroundColor: Colors.white,
-        )
-      );
-      this.setState(() {
-        imageFile = cropped;
-        print(imageFile.lengthSync());
-      });
+      try {
+        File cropped = await ImageCropper.cropImage(
+          sourcePath: image.path,
+          aspectRatio: CropAspectRatio(
+            ratioX: 1,
+            ratioY: 1
+          ),
+          compressQuality: 100,
+          maxWidth: 700,
+          maxHeight: 700,
+          compressFormat: ImageCompressFormat.jpg,
+          androidUiSettings: AndroidUiSettings(
+            toolbarColor: Colors.deepOrange,
+            toolbarTitle: 'Adjust your profile image',
+            statusBarColor: Colors.deepOrange.shade900,
+            backgroundColor: Colors.white,
+          )
+        );
+        this.setState(() {
+          imageFile = cropped;
+        });
+        return true;
+      } catch (err) {
+        return false;
+      }
+    } else {
+      return false;
     }
   }
   
 
-  Future<dynamic> _submitImage() {
+  Future<dynamic> submitImage() {
 
   }
 
+  /// This function asks the user the place to take the image
   Future<ImageSource> picFromWhere() async {
     return showDialog<ImageSource>(
       context: context,
@@ -97,7 +107,6 @@ class _ProfileAppBar extends State<ProfileAppBar> {
         );
       }
     );
-    
   }
 
   Widget build(context) {
@@ -147,18 +156,10 @@ class _ProfileAppBar extends State<ProfileAppBar> {
                     onPressed: (){
                       picFromWhere()
                         .then(( ImageSource source) {
-                          getImage(source).then((response) {
-                            if (response != null) {
-                              setState(() {
-                                imageFile = File(response.path);
-                              });
-                            }
-                          });
+                          getImage(source);
                         }).catchError((error) {
                           print(error.toString());
                         });
-                      // Open a modal to select if take a pic from camera
-                      // or get it from the media gallery
                     }
                   ),
                 ),
