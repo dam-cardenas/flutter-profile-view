@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:image_cropper/image_cropper.dart';
 
-enum picOptions { fromCamera, fromGallery }
 class ProfileAppBar extends StatefulWidget {
   final String profileImage;
   final String userName;
@@ -29,17 +29,41 @@ class _ProfileAppBar extends State<ProfileAppBar> {
       'assets/images/userThumbnail.png',
     );
   }
-
-  Future<PickedFile> _openCamera() {
-    return picker.getImage(source: ImageSource.camera);
+  
+  Future<PickedFile>  getImage(ImageSource source) async {
+    PickedFile image = await picker.getImage(source: source);
+    if (image != null) {
+      File cropped = await ImageCropper.cropImage(
+        sourcePath: image.path,
+        aspectRatio: CropAspectRatio(
+          ratioX: 1,
+          ratioY: 1
+        ),
+        compressQuality: 100,
+        maxWidth: 700,
+        maxHeight: 700,
+        compressFormat: ImageCompressFormat.jpg,
+        androidUiSettings: AndroidUiSettings(
+          toolbarColor: Colors.deepOrange,
+          toolbarTitle: 'Adjust your profile image',
+          statusBarColor: Colors.deepOrange.shade900,
+          backgroundColor: Colors.white,
+        )
+      );
+      this.setState(() {
+        imageFile = cropped;
+        print(imageFile.lengthSync());
+      });
+    }
   }
   
-  Future<PickedFile> _openGallery() {
-    return picker.getImage(source: ImageSource.gallery);
+
+  Future<dynamic> _submitImage() {
+
   }
 
-  Future<picOptions> picFromWhere() async {
-    return showDialog<picOptions>(
+  Future<ImageSource> picFromWhere() async {
+    return showDialog<ImageSource>(
       context: context,
       builder: (BuildContext context) {
         return SimpleDialog(
@@ -49,7 +73,7 @@ class _ProfileAppBar extends State<ProfileAppBar> {
               onPressed: () { 
                 Navigator.pop(
                   context,
-                  picOptions.fromCamera
+                  ImageSource.camera
                 ); 
               },
               child: ListTile(
@@ -61,7 +85,7 @@ class _ProfileAppBar extends State<ProfileAppBar> {
               onPressed: () {
                 Navigator.pop(
                   context, 
-                  picOptions.fromGallery
+                  ImageSource.gallery
                 );
               },
               child: ListTile(
@@ -122,23 +146,13 @@ class _ProfileAppBar extends State<ProfileAppBar> {
                     mini: true,
                     onPressed: (){
                       picFromWhere()
-                        .then((value) {
-                          Future<PickedFile> response;
-                          switch(value){
-                            case picOptions.fromCamera:
-                              response = this._openCamera();
-                            break;
-                            case picOptions.fromGallery:
-                              response = this._openGallery();
-                            break;
-                          }
-                          response.then((PickedFile value){
-                            if (value != null) {
+                        .then(( ImageSource source) {
+                          getImage(source).then((response) {
+                            if (response != null) {
                               setState(() {
-                                imageFile = File(value.path);
+                                imageFile = File(response.path);
                               });
                             }
-                            print(value.toString());
                           });
                         }).catchError((error) {
                           print(error.toString());
