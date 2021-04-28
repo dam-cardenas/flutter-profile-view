@@ -5,14 +5,12 @@ import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
 
 class ProfileAppBar extends StatefulWidget {
-  final String profileImage;
-  final String userName;
-  final String title;
+  final String profileImagePath;
+  final Function onSubmitImage;
   ProfileAppBar(
     {
-      this.title,
-      this.profileImage,
-      this.userName,
+      this.profileImagePath,
+      @required this.onSubmitImage,
     }
   );
   @override
@@ -28,6 +26,21 @@ class _ProfileAppBar extends State<ProfileAppBar> {
     this.thumbnail = AssetImage(
       'assets/images/userThumbnail.png',
     );
+    if (widget.profileImagePath != null) {
+      imageFile = widget.profileImagePath.isNotEmpty?
+        File(widget.profileImagePath)
+        : null;
+    }
+  }
+
+  ImageProvider imageToShow() {
+    if (imageFile != null) {
+      return Image.file(
+          imageFile,
+        ).image;
+    } else {
+      return thumbnail;
+    }
   }
   
   /// This function  makes the action of get and crop an image 
@@ -48,14 +61,15 @@ class _ProfileAppBar extends State<ProfileAppBar> {
           maxHeight: 700,
           compressFormat: ImageCompressFormat.jpg,
           androidUiSettings: AndroidUiSettings(
-            toolbarColor: Colors.deepOrange,
+            toolbarColor: Colors.amber[900],
             toolbarTitle: 'Adjust your profile image',
-            statusBarColor: Colors.deepOrange.shade900,
+            statusBarColor: Colors.amber[900],
             backgroundColor: Colors.white,
           )
         );
         this.setState(() {
           imageFile = cropped;
+          widget.onSubmitImage(imageFile);
         });
         return true;
       } catch (err) {
@@ -64,11 +78,6 @@ class _ProfileAppBar extends State<ProfileAppBar> {
     } else {
       return false;
     }
-  }
-  
-
-  Future<dynamic> submitImage() {
-
   }
 
   /// This function asks the user the place to take the image
@@ -116,29 +125,26 @@ class _ProfileAppBar extends State<ProfileAppBar> {
           decoration: BoxDecoration(
             color: Colors.amber[900]
           ),
-          height: MediaQuery.of(context).size.height * 0.2
+          height: MediaQuery.of(context).size.height * 0.13
         ),
         Center(
+          // TODO: Add animation to the image
           child: Container(
             decoration: BoxDecoration(
               color: Colors.grey[100],
               borderRadius: BorderRadiusDirectional.circular(500.0),
               image: DecorationImage(
-                image: imageFile != null ? 
-                  Image.file(
-                      imageFile,
-                    ).image
-                  : thumbnail,
+                image: imageToShow(),
                 fit: BoxFit.cover,
               )
             ),
             margin: EdgeInsets.only(
               left: 15.0,
               right: 15.0,
-              top: 100.0,
+              top: 20.0,
             ),
-            height: MediaQuery.of(context).size.height * 0.15,
-            width: MediaQuery.of(context).size.height * 0.15,
+            height: MediaQuery.of(context).size.height * 0.19,
+            width: MediaQuery.of(context).size.height * 0.19 ,
             child: Stack(
               children: [
                 Positioned(
@@ -156,7 +162,9 @@ class _ProfileAppBar extends State<ProfileAppBar> {
                     onPressed: (){
                       picFromWhere()
                         .then(( ImageSource source) {
-                          getImage(source);
+                          if (source != null) {
+                            getImage(source);
+                          }
                         }).catchError((error) {
                           print(error.toString());
                         });
@@ -165,21 +173,6 @@ class _ProfileAppBar extends State<ProfileAppBar> {
                 ),
               ],
             ),
-          )
-        ),
-        Positioned(
-          top: 0.0,
-          left: 0.0,
-          right: 0.0,
-          child: AppBar(
-            title: Text(widget.title),
-            leading: IconButton(
-              icon: Icon(Icons.arrow_back_ios),
-              onPressed: () {},
-            ),
-            centerTitle: true,
-            backgroundColor: Colors.transparent,
-            elevation: 0,
           )
         ),
       ],

@@ -1,66 +1,90 @@
 import 'package:flutter/material.dart';
 
 class UserDataForm extends StatefulWidget {
-  UserDataForm({Key key}) : super(key: key);
+  final String username;
+  final String email;
+  final Function onSubmit;
+  
+  UserDataForm(
+    {
+      @required this.username,
+      @required this.email,
+      @required this.onSubmit,
+    }
+  );
+
   @override
   _UserDataForm createState() => _UserDataForm();
 }
 class _UserDataForm extends State<UserDataForm> {
-  TextEditingController _username = TextEditingController();
-  TextEditingController _email = TextEditingController();
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  TextEditingController usernameInputController = TextEditingController();
+  TextEditingController emailInputController = TextEditingController();
 
   @override
   void initState() {
-    _username = TextEditingController();
-    _email = TextEditingController();
+    usernameInputController = TextEditingController();
+    emailInputController = TextEditingController();
+    usernameInputController.text = widget.username;
+    emailInputController.text = widget.email;
     super.initState();
   }
 
   @override
   void dispose() {
     super.dispose();
-    _username.dispose();
-    _email.dispose();
+    usernameInputController.dispose();
+    emailInputController.dispose();
   }
 
-  void resetForm() {
-    _formKey.currentState.reset();
-  }
-
-  void formSubmit() async {
-    // TODO: Call the services to set the user data
-  }
-  void getUserData() async {
-    // TODO: call the services to get the user  data
-  }
-
-  void isValidEmail(String email) {
+  bool isValidEmail(String email) {
     // TODO: validate the email pattern
     // check if the email is already taken
+    return true;
   }
 
-  void isValidUsername(String username) {
+  bool isValidUsername(String username) {
     // TODO: Validate username
+    return true;
   }
   
   @override
   Widget build(BuildContext context) {
-    // TODO: The correct form  data
     return Form(
       child: Column(
         children: [
           SizedBox(
             height: 20,
           ),
+          SizedBox(
+          width: MediaQuery.of(context).size.width,
+          child: Text(
+            'Basic info',
+            textAlign: TextAlign.left,
+            style: TextStyle(
+              fontSize: 18.0,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+          SizedBox(
+            height: 20,
+          ),
           TextFormField(
-            controller: _username,
+            controller: usernameInputController,
             keyboardType: TextInputType.text,
             decoration: InputDecoration(
               labelText: 'Full Name',
               hintText: "Your Full Name",
+              isDense: true,
               labelStyle: TextStyle(color: Colors.black54),
-              suffixIcon: Icon(Icons.person, color: Colors.grey),
+              contentPadding: new EdgeInsets.symmetric(
+                vertical: 5.0,
+                horizontal: 10.0
+              ),
+              suffixIcon: Icon(
+                Icons.person, 
+                color: Colors.grey,
+              ),
               border: OutlineInputBorder(),
               focusedBorder: OutlineInputBorder(
                 borderSide: BorderSide(
@@ -75,11 +99,17 @@ class _UserDataForm extends State<UserDataForm> {
             height: 20,
           ),
           TextFormField(
-            controller: _email,
+            controller: emailInputController,
             keyboardType: TextInputType.emailAddress,
             decoration: InputDecoration(
               labelText: 'Email',
+              enabled: false,
               hintText: "example@domain.com",
+              isDense: true,
+              contentPadding: new EdgeInsets.symmetric(
+                vertical: 5.0,
+                horizontal: 10.0
+              ),
               labelStyle: TextStyle(color: Colors.black54),
               suffixIcon: Icon(Icons.email, color: Colors.grey),
               border: OutlineInputBorder(),
@@ -97,7 +127,7 @@ class _UserDataForm extends State<UserDataForm> {
           ),
           SizedBox(
             width: MediaQuery.of(context).size.width,
-            height: 56.0,
+            height: 47.0,
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
                 primary: Colors.amber[900],
@@ -109,8 +139,20 @@ class _UserDataForm extends State<UserDataForm> {
                   ),
                 ),
               ),
-              onPressed: () {
-                // call the api to update the user 
+              onPressed: (){
+                final String email = emailInputController.text;
+                final String username = usernameInputController.text;
+                final bool emailValid = isValidEmail(email);
+                final bool usernameValid = isValidUsername(username);
+                // set invalid 
+                final Map<String,dynamic> response = usernameValid && emailValid?
+                  {
+                    'username': username,
+                    'email': email
+                  }
+                  : null;
+                widget.onSubmit(response);
+
               },
               child: Text("Save"),
             ),
@@ -122,181 +164,3 @@ class _UserDataForm extends State<UserDataForm> {
 }
 
 
-// class SignUpForm extends StatefulWidget {
-//   SignUpForm({Key key}) : super(key: key);
-
-//   @override
-//   _SignUpFormState createState() => _SignUpFormState();
-// }
-
-// class _SignUpFormState extends State<SignUpForm> {
-//   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-//   final service = SignUpService();
-
- 
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Form(
-//       key: _formKey,
-//       child: Column(
-//         children: [
-//           TextFormField(
-//             cursorColor: kPrimaryColor,
-//             autofocus: true,
-//             decoration: InputDecoration(
-//               hintText: "Enter name",
-//               labelText: "Name",
-//               labelStyle: TextStyle(color: Colors.black54),
-//               suffixIcon: Icon(Icons.person, color: Colors.grey),
-//               focusedBorder: UnderlineInputBorder(
-//                 borderSide: BorderSide(color: kPrimaryColor),
-//               ),
-//             ),
-//             autovalidateMode: AutovalidateMode.onUserInteraction,
-//             validator: (value) {
-//               if (value.isEmpty) {
-//                 return "*Name is required";
-//               }
-//               return null;
-//             },
-//             onSaved: (String value) {
-//               _name = value;
-//             },
-//           ),
-//           SizedBox(
-//             height: 20,
-//           ),
-//           TextFormField(
-//             cursorColor: kPrimaryColor,
-//             keyboardType: TextInputType.text,
-//             textCapitalization: TextCapitalization.none,
-//             decoration: InputDecoration(
-//               hintText: "example@domain.com",
-//               labelText: "Email",
-//               labelStyle: TextStyle(color: Colors.black54),
-//               suffixIcon: Icon(Icons.email_outlined, color: Colors.grey),
-//               focusedBorder: UnderlineInputBorder(
-//                 borderSide: BorderSide(color: kPrimaryColor),
-//               ),
-//             ),
-//             autovalidateMode: AutovalidateMode.onUserInteraction,
-//             validator: (value) {
-//               if (value.isEmpty) {
-//                 return "*Email is required";
-//               }
-
-//               if (!isValidEmail(value)) {
-//                 return "*Please enter a valid email";
-//               }
-
-//               return null;
-//             },
-//             onSaved: (String value) {
-//               _email = value.toLowerCase();
-//             },
-//           ),
-//           SizedBox(
-//             height: 20,
-//           ),
-//           TextFormField(
-//             controller: _password,
-//             cursorColor: kPrimaryColor,
-//             obscureText: !_showPassword,
-//             decoration: InputDecoration(
-//               hintText: "Enter password",
-//               labelText: "Password",
-//               labelStyle: TextStyle(color: Colors.black54),
-//               suffixIcon: GestureDetector(
-//                 onTap: () {
-//                   setState(() {
-//                     _showPassword = !_showPassword;
-//                   });
-//                 },
-//                 child: _showPassword
-//                     ? Icon(Icons.visibility, color: Colors.grey)
-//                     : Icon(Icons.visibility_off, color: Colors.grey),
-//               ),
-//             ),
-//             autovalidateMode: AutovalidateMode.onUserInteraction,
-//             autocorrect: false,
-//             validator: (value) {
-//               if (value.isEmpty) {
-//                 return "*Password is required";
-//               }
-//               if (!isValidPassword(value)) {
-//                 return "*The password must be a minimum of 8 characters. \nInclude an upper case letter, a lower case letter, a number, \nand a symbol.";
-//               }
-//               return null;
-//             },
-//           ),
-//           SizedBox(
-//             height: 20,
-//           ),
-//           TextFormField(
-//             controller: _confirmPassword,
-//             cursorColor: kPrimaryColor,
-//             obscureText: !_showConfirmPassword,
-//             decoration: InputDecoration(
-//               hintText: "Enter password",
-//               labelText: "Confirm Password",
-//               labelStyle: TextStyle(color: Colors.black54),
-//               suffixIcon: GestureDetector(
-//                 onTap: () {
-//                   setState(() {
-//                     _showConfirmPassword = !_showConfirmPassword;
-//                   });
-//                 },
-//                 child: _showConfirmPassword
-//                     ? Icon(Icons.visibility, color: Colors.grey)
-//                     : Icon(Icons.visibility_off, color: Colors.grey),
-//               ),
-//               focusedBorder: UnderlineInputBorder(
-//                 borderSide: BorderSide(color: kPrimaryColor),
-//               ),
-//             ),
-//             autocorrect: false,
-//             autovalidateMode: AutovalidateMode.onUserInteraction,
-//             validator: (value) {
-//               if (value.isEmpty) {
-//                 return "*Confirm password is required";
-//               }
-
-//               if (_confirmPassword.text != _password.text) {
-//                 return "*Passwords don't match";
-//               }
-
-//               return null;
-//             },
-//           ),
-//           SizedBox(
-//             height: 20,
-//           ),
-//           SizedBox(
-//             width: MediaQuery.of(context).size.width,
-//             height: 56.0,
-//             child: ElevatedButton(
-//               style: ElevatedButton.styleFrom(
-//                 primary: Colours.brandOrange,
-//                 onPrimary: Colors.white,
-//                 elevation: 1.0,
-//                 shape: RoundedRectangleBorder(
-//                   borderRadius: BorderRadius.all(
-//                     Radius.circular(6.0),
-//                   ),
-//                 ),
-//               ),
-//               onPressed: () {
-//                 if (_formKey.currentState.validate()) {
-//                   _formKey.currentState.save();
-//                   formSubmit();
-//                 }
-//               },
-//               child: Text("Sign up"),
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
